@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonsai Life (Part I) - 3D Telugu & English Interactive Lesson</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js for 3D Metaphor Visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts: Inter, Playfair Display, and Noto Sans Telugu -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Telugu:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        indigoDeep: '#0f1026',
+                        indigoCard: '#1a1c3b',
+                        terracotta: '#e05a47',
+                        marigold: '#f59e0b',
+                        gongura: '#10b981',
+                        cream: '#fef3c7'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Telugu', 'sans-serif'],
+                        telugu: ['Noto Sans Telugu', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at 20% 20%, #1e1b4b 0%, #090a1a 60%, #05060f 100%);
+            color: #f8fafc;
+            overflow-x: hidden;
+            font-family: 'Inter', 'Noto Sans Telugu', sans-serif;
+        }
+
+        /* Custom Glassmorphism */
+        .glass-panel {
+            background: rgba(26, 28, 59, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        }
+
+        /* 3D Perspective Containers */
+        .scene-3d-stage {
+            perspective: 1400px;
+        }
+
+        .card-3d-tilt {
+            transform-style: preserve-3d;
+            transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.35s ease;
+        }
+
+        .card-3d-content {
+            transform: translateZ(35px);
+        }
+
+        .card-3d-badge {
+            transform: translateZ(55px);
+        }
+
+        /* 3D Flip Cards for Glossary */
+        .flip-card {
+            perspective: 1000px;
+            height: 250px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner,
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flip-card-front {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.6);
+        }
+
+        .flip-card-back {
+            background: linear-gradient(135deg, #b45309, #7c2d12);
+            color: #fff;
+            transform: rotateY(180deg);
+            border: 1px solid rgba(254, 243, 199, 0.5);
+            box-shadow: 0 12px 30px -5px rgba(224, 90, 71, 0.4);
+        }
+
+        /* 3D Carousel Transitions */
+        .carousel-3d-wrapper {
+            perspective: 1500px;
+            position: relative;
+        }
+
+        .carousel-slide {
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform-style: preserve-3d;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e05a47;
+            border-radius: 4px;
+        }
+
+        /* Floating Animation */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+        .animate-float {
+            animation: floatSlow 5s ease-in-out infinite;
+        }
+
+        /* Active Tab Styling */
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f59e0b, #e05a47);
+            color: #0f1026;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen selection:bg-marigold selection:text-indigoDeep">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-amber-500/20 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-marigold to-terracotta flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <i class="fa-solid fa-seedling text-indigoDeep text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-marigold font-semibold block">Class 8 English • Unit 7: Women Empowerment</span>
+                    <h1 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                        <span>Bonsai Life - Part I</span>
+                        <span class="text-amber-300 font-telugu text-base md:text-lg">(బోన్సాయ్ బ్రతుకులు)</span>
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Language Mode Switcher -->
+            <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-amber-500/30">
+                <button onclick="setLanguageMode('both')" id="lang-both" class="tab-btn active px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-all">
+                    <i class="fa-solid fa-columns mr-1"></i> Both (తెలుగు + Eng)
+                </button>
+                <button onclick="setLanguageMode('te')" id="lang-te" class="tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm text-slate-300 hover:text-white transition-all font-telugu">
+                    తెలుగు మాత్రమే
+                </button>
+                <button onclick="setLanguageMode('en')" id="lang-en" class="tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm text-slate-300 hover:text-white transition-all">
+                    English Only
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-16">
+
+        <!-- HERO SECTION WITH INTERACTIVE 3D THREE.JS METAPHOR -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <!-- Left Text Intro -->
+            <div class="lg:col-span-6 space-y-5">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 text-xs font-semibold">
+                    <i class="fa-solid fa-feather-pointed"></i> Written by Abburi Chayadevi (అబ్బూరి ఛాయాదేవి)
+                </div>
+
+                <h2 class="text-3xl sm:text-5xl font-extrabold leading-tight">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-amber-400 to-terracotta">
+                        మహిళా సాధికారత:
+                    </span>
+                    <span class="block text-white mt-1 font-telugu">బోన్సాయ్ జీవితం నుండి స్వేచ్ఛా వృక్షం వైపు!</span>
+                </h2>
+
+                <p class="text-slate-300 leading-relaxed text-base sm:text-lg font-telugu">
+                    ప్రముఖ రచయిత్రి <strong>అబ్బూరి ఛాయాదేవి</strong> గారు రచించిన <span class="text-amber-300 font-semibold">"బోన్సాయ్ బ్రతుకులు"</span> కథలో మొదటి భాగం ఇది. చదువుకుని ఉద్యోగం చేస్తున్న చెల్లెలు (అమ్మలు), చదువు లేక పల్లెటూరికే పరిమితమైన అక్కయ్యల మధ్య జరిగే ఆప్యాయ సంభాషణ ద్వారా <strong>ఆడపిల్లల చదువు, ఆర్థిక స్వాతంత్ర్యం, ఆత్మగౌరవం</strong> ఎంత ముఖ్యమో ఈ పాఠం కళ్ళకు కట్టినట్లు వివరిస్తుంది.
+                </p>
+
+                <div class="grid grid-cols-3 gap-3 pt-2">
+                    <div class="glass-panel p-3.5 rounded-xl border-l-4 border-l-marigold">
+                        <div class="text-amber-400 font-bold text-lg font-telugu">అమ్మలు</div>
+                        <div class="text-xs text-slate-300">Narrator • Educated & Working in City</div>
+                    </div>
+                    <div class="glass-panel p-3.5 rounded-xl border-l-4 border-l-gongura">
+                        <div class="text-emerald-400 font-bold text-lg font-telugu">అక్కయ్య</div>
+                        <div class="text-xs text-slate-300">Elder Sister • Class 5, Village Homemaker</div>
+                    </div>
+                    <div class="glass-panel p-3.5 rounded-xl border-l-4 border-l-terracotta">
+                        <div class="text-rose-400 font-bold text-lg font-telugu">బావగారు</div>
+                        <div class="text-xs text-slate-300">Brother-in-law • Educated Farmer</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <a href="#story-explorer" class="px-6 py-3 rounded-xl bg-gradient-to-r from-marigold to-terracotta text-indigoDeep font-bold shadow-lg shadow-amber-500/25 hover:scale-105 transition-transform flex items-center gap-2">
+                        <i class="fa-solid fa-book-open"></i> పాఠం ప్రారంభించండి (Explore 6 Scenes)
+                    </a>
+                    <a href="#quiz-section" class="px-5 py-3 rounded-xl glass-panel text-amber-300 hover:bg-amber-500/10 font-semibold transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad"></i> 3D క్విజ్ ఆడండి
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right 3D Interactive Three.js Canvas -->
+            <div class="lg:col-span-6">
+                <div class="glass-panel rounded-2xl p-4 relative overflow-hidden border border-amber-500/40">
+                    <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+                        <div>
+                            <span class="text-xs uppercase tracking-wider text-amber-400 font-bold block">Interactive 3D Metaphor (లాగి తిప్పండి)</span>
+                            <h3 id="tree-mode-title" class="text-lg font-bold text-white font-telugu">కుండీలో బోన్సాయ్ చెట్టు (Bonsai in a Pot)</h3>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="switch3DTree('bonsai')" id="btn-3d-bonsai" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-terracotta text-white shadow-md transition">
+                                🪴 Bonsai Life (అణచివేత)
+                            </button>
+                            <button onclick="switch3DTree('free')" id="btn-3d-free" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600 hover:text-white transition">
+                                🌳 Empowered Tree (స్వేచ్ఛ)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3D Canvas Container -->
+                    <div id="three-canvas-container" class="w-full h-72 sm:h-80 rounded-xl bg-gradient-to-b from-indigo-950/80 to-slate-950 relative cursor-grab active:cursor-grabbing overflow-hidden">
+                        <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center pointer-events-none">
+                            <span id="tree-caption" class="px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-md text-xs text-amber-200 font-telugu border border-amber-500/30">
+                                చదువు లేకపోతే స్త్రీ జీవితం కుండీలో పెరిగే బోన్సాయ్ చెట్టులా ఇతరులపై ఆధారపడి ఉంటుంది.
+                            </span>
+                            <span class="px-2.5 py-1 rounded bg-white/10 text-[11px] text-slate-300 hidden sm:inline">
+                                <i class="fa-solid fa-hand-pointer mr-1"></i> Drag to Rotate 360°
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: INTERACTIVE 3D SCENE CAROUSEL & BILINGUAL STORY -->
+        <section id="story-explorer" class="space-y-6 pt-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-emerald-400 font-bold">Step-by-Step Bilingual Walkthrough</span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white font-telugu mt-1">
+                        పాఠం సారాంశం - 6 దృశ్యాలలో <span class="text-amber-400 font-sans text-xl">(6 Interactive 3D Scenes)</span>
+                    </h2>
+                </div>
+
+                <!-- View Mode Switch: 3D Carousel vs All Grid -->
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleStoryLayout('carousel')" id="layout-carousel" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 text-indigoDeep shadow-md transition">
+                        <i class="fa-solid fa-cube mr-1"></i> 3D Book View
+                    </button>
+                    <button onclick="toggleStoryLayout('grid')" id="layout-grid" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold glass-panel text-slate-200 hover:text-amber-300 transition">
+                        <i class="fa-solid fa-grip mr-1"></i> Show All 6 Scenes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scene Progress Pills (for Carousel mode) -->
+            <div id="scene-pills-bar" class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/70 p-2 rounded-2xl border border-slate-800">
+                <div class="flex flex-wrap gap-1.5" id="scene-indicators">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="changeScene(-1)" class="w-9 h-9 rounded-xl glass-panel hover:bg-amber-500 hover:text-indigoDeep flex items-center justify-center transition" title="Previous Scene">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <span id="scene-counter" class="text-xs font-bold text-amber-300 px-2">1 / 6</span>
+                    <button onclick="changeScene(1)" class="w-9 h-9 rounded-xl glass-panel hover:bg-amber-500 hover:text-indigoDeep flex items-center justify-center transition" title="Next Scene">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3D Scene Stage Container -->
+            <div id="scenes-container" class="scene-3d-stage">
+                <!-- Populated dynamically by JavaScript -->
+            </div>
+        </section>
+
+        <!-- SECTION 3: 3D FLIP-CARD GLOSSARY & IDIOMS -->
+        <section class="space-y-6 pt-6">
+            <div class="text-center max-w-3xl mx-auto space-y-2">
+                <span class="px-3 py-1 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 text-xs font-bold uppercase tracking-widest">
+                    Interactive 3D Flip Cards
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white font-telugu">
+                    ముఖ్యమైన పదాలు & జాతీయాలు <span class="text-amber-400 font-sans text-xl">(Glossary & Idioms)</span>
+                </h2>
+                <p class="text-slate-400 text-sm font-telugu">
+                    ఇంగ్లీష్ పదం లేదా జాతీయం మీద మౌస్ ఉంచండి లేదా టచ్ చేయండి — కార్డు 3Dలో తిరిగి తెలుగు అర్థాన్ని చూపిస్తుంది!
+                </p>
+            </div>
+
+            <div id="glossary-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- SECTION 4: COMPARISON TABLE (AMMAlU VS AKKAYYA) -->
+        <section class="glass-panel rounded-3xl p-6 sm:p-8 border border-amber-500/30">
+            <h3 class="text-xl sm:text-2xl font-bold text-amber-300 font-telugu mb-6 flex items-center gap-3">
+                <i class="fa-solid fa-scale-balanced text-2xl"></i>
+                <span>అక్కయ్య మరియు అమ్మలు (రచయిత్రి) జీవితాల్లో వ్యత్యాసం</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Akkayya Card -->
+                <div class="bg-slate-900/80 rounded-2xl p-5 border border-rose-500/30 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-lg font-bold text-rose-400 font-telugu">👵 అక్కయ్య (Elder Sister)</span>
+                        <span class="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 text-xs font-semibold">Bonsai Metaphor</span>
+                    </div>
+                    <ul class="space-y-2.5 text-sm text-slate-200 font-telugu">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-dot text-rose-400 mt-1"></i>
+                            <span><strong>చదువు:</strong> ఆడపిల్లకు చదువు ఎందుకని నాన్నగారు 5వ తరగతితోనే చదువు మాన్పించారు (చాకలి పద్దులు రాస్తే చాలనుకునే కాలం).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-dot text-rose-400 mt-1"></i>
+                            <span><strong>జీవిత విధానం:</strong> పల్లెటూరిలో వ్యవసాయం చేసే బావగారితో పెళ్ళి జరిగింది; ఇల్లు, పశువులు, వంటకే పరిమితమైంది.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-dot text-rose-400 mt-1"></i>
+                            <span><strong>ఆర్థిక స్థితి:</strong> కరివేపాకు కొనడానికి కూడా భర్త దగ్గర పైసలు అడగాల్సిన నిస్సహాయ స్థితి.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-dot text-rose-400 mt-1"></i>
+                            <span><strong>గొప్ప నిర్ణయం:</strong> తన కూతురు తనలాగా "చెప్పు కింద తేలులా" బతకకూడదని కాలేజీకి పంపాలని గట్టిగా నిశ్చయించుకుంది.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Ammalu Card -->
+                <div class="bg-slate-900/80 rounded-2xl p-5 border border-emerald-500/30 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-lg font-bold text-emerald-400 font-telugu">👩‍💼 అమ్మలు (Ammalu - Narrator)</span>
+                        <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold">Empowered Woman</span>
+                    </div>
+                    <ul class="space-y-2.5 text-sm text-slate-200 font-telugu">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1"></i>
+                            <span><strong>చదువు:</strong> పదేళ్ల తర్వాత పుట్టడం వల్ల మారిన కాలంతో పాటు నాన్నగారు ఆమెను కాలేజీకి పంపి చదివించారు.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1"></i>
+                            <span><strong>జీవిత విధానం:</strong> చదువుకున్న అమ్మాయి ఇంటికే పరిమితం కాకూడదనే పట్టుదలతో నగరంలో ఉద్యోగం చేస్తోంది.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1"></i>
+                            <span><strong>సవాళ్లు:</strong> ఆఫీసు పని, ఇంటి పని రెండింటినీ బ్యాలెన్స్ చేయడం కష్టంగా (uphill task) అనిపిస్తుంది.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1"></i>
+                            <span><strong>ఆత్మగౌరవం:</strong> ఎవరినీ చేయి చాచి అడగకుండా గౌరవప్రదమైన (dignified) జీవితాన్ని గడుపుతోంది.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: INTERACTIVE 3D COMPREHENSION QUIZ -->
+        <section id="quiz-section" class="glass-panel rounded-3xl p-6 sm:p-10 border border-amber-500/40 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Test Your Understanding</span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white font-telugu mt-1">
+                        పాఠం ఆధారిత క్విజ్ <span class="text-amber-300 text-xl font-sans">(Interactive 3D Quiz)</span>
+                    </h2>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-900/90 px-4 py-2 rounded-xl border border-amber-500/30">
+                    <span class="text-xs text-slate-400">Score:</span>
+                    <span id="quiz-score-badge" class="text-lg font-extrabold text-amber-400">0 / 5</span>
+                    <button onclick="resetQuiz()" class="ml-2 text-xs text-slate-300 hover:text-white underline">Reset</button>
+                </div>
+            </div>
+
+            <div id="quiz-container" class="space-y-6">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 py-8 text-center text-slate-400 text-xs sm:text-sm">
+        <p class="font-telugu">8వ తరగతి ఇంగ్లీష్ • యూనిట్ 7: మహిళా సాధికారత (Women Empowerment) — బోన్సాయ్ బ్రతుకులు (భాగం 1)</p>
+        <p class="mt-1 text-slate-500">Original Telugu Story by Abburi Chayadevi • Translated by Alladi Uma & M. Sridhar</p>
+    </footer>
+
+    <!-- APPLICATION JAVASCRIPT -->
+    <script>
+        /* ==========================================
+           1. BILINGUAL SCENE DATA (6 SCENES OF PART I)
+           ========================================== */
+        const scenesData = [
+            {
+                id: 1,
+                badge: "Scene 1 • దృశ్యం 1",
+                icon: "fa-envelope-open-text",
+                accent: "from-amber-500 to-orange-600",
+                titleEn: "The Joy of Receiving Letters",
+                titleTe: "ఉత్తరాల ఆనందం - అలసట మాయం!",
+                props: ["✉️ Inland Letters", "☕ Hot Coffee", "🧆 Pakodas & Bajjis"],
+                originalEn: `“The moment I see letters waiting for me on the doorstep when I return from work, I can’t contain my excitement. It’s almost as if I’m face to face with my near and dear ones... Instantly the exhaustion of office work vanishes and my heart grows light. Instead of entering the kitchen muttering, ‘Oh no, Oh God’... I feel like singing a song, humming a tune, making a nice cup of coffee and savouring each sip. What is more, the sight of inland letters or envelopes in a familiar hand gives me the energy and enthusiasm to quickly make and eat some pakodas or bajjis!”`,
+                explanationTe: `రచయిత్రి (అమ్మలు) ఆఫీసులో పని ముగించుకుని అలసిపోయి ఇంటికి తిరిగి రాగానే, గుమ్మం దగ్గర తన కోసం ఎదురుచూస్తున్న ఉత్తరాలు కనిపిస్తే ఆమె ఆనందానికి అవధులు ఉండవు. ఆ ఉత్తరాలు చూస్తుంటే తన ఆప్తులే ఎదురుగా నిలబడి ఆప్యాయంగా మాట్లాడుతున్నట్లు అనిపిస్తుంది. వెంటనే ఆఫీసు పని తాలూకు అలసట (exhaustion) అంతా మాయమైపోయి మనసు తేలికపడుతుంది. సాధారణంగా అలసిపోయి వచ్చినప్పుడు 'అయ్యో దేవుడా' అని గొణుక్కుంటూ వంటగదిలోకి వెళ్ళే ఆమెకు, తెలిసిన చేతిరాతతో ఉన్న ఉత్తరాలు కనిపిస్తే మాత్రం పాటలు పాడుకుంటూ, మంచి కాఫీ పెట్టుకుని తాగుతూ, వేడివేడిగా పకోడీలు లేదా బజ్జీలు చేసుకుని తినాలనే ఉత్సాహం వస్తుంది! ఉత్తరాలు రాయడంలో బద్ధకస్తురాలైనప్పటికీ, రోజూ ఎవరో ఒకరి నుండి ఉత్తరం రావాలని ఆమె కోరుకుంటుంది.`,
+                keyTakeawayTe: "ఆత్మీయుల నుండి వచ్చే ఉత్తరాలు మనసుకు నూతనోత్సాహాన్ని ఇస్తాయి."
+            },
+            {
+                id: 2,
+                badge: "Scene 2 • దృశ్యం 2",
+                icon: "fa-train-subway",
+                accent: "from-emerald-500 to-teal-600",
+                titleEn: "Akkayya's Unexpected Letter",
+                titleTe: "అక్కయ్య ఆకస్మిక ఉత్తరం - కాశీ యాత్ర",
+                props: ["📜 Akkayya's Letter", "🛕 Kasi & Haridwar", "🏙️ First City Visit"],
+                originalEn: `“This is an unexpected letter. If my Akkayya, who doesn’t normally write, went out of her way to write a letter, there has to be a reason. As I open the letter, I am a little apprehensive... ‘Ammalu! You must be very surprised to receive my letter. You would be even more surprised if I were to tell you that your Baavagaru and I are coming to your place. We have been planning for quite a while to visit Kasi and Haridwar...’ Akkayya and Baavagaru were coming to this city and our home for the first time since my marriage.”`,
+                explanationTe: `ఆ రోజు ఒక ఊహించని ఉత్తరం వచ్చింది. సాధారణంగా ఎప్పుడూ ఉత్తరం రాయని 'అక్కయ్య' పనిగట్టుకుని ఉత్తరం రాసిందంటే ఏదో బలమైన కారణం ఉండే ఉంటుంది. ఏదైనా చెడు వార్త ఏమోనని కొంచెం భయంగా (apprehensive) ఉత్తరం తెరిచింది అమ్మలు. అందులో అక్కయ్య ఇలా రాసింది: "అమ్మలూ! నా ఉత్తరం చూసి నువ్వు చాలా ఆశ్చర్యపోతావు. మీ బావగారు, నేను కాశీ, హరిద్వార్ వెళ్ళాలని ఎప్పటినుండో అనుకుంటున్నాం. ఇప్పటికి కుదిరింది, ఆ ప్రయాణంలో మీ ఇంటికి వస్తున్నాం!" అమ్మలుకు పెళ్ళయినప్పటి నుండి అక్కయ్య, బావగారు వాళ్ళ పల్లెటూరు విడిచి ఈ పెద్ద నగరానికి, అమ్మలు ఇంటికి రావడం ఇదే మొదటిసారి! పిల్లలు, గొడ్లు, వంట మొదలైన సాకులతో వాళ్ళు ఎప్పుడూ ఊరు విడిచి బయటకు రాలేదు. ఈ వార్త వినగానే అమ్మలు భర్త కూడా ఎంతో సంతోషించాడు.`,
+                keyTakeawayTe: "పెళ్ళయిన తర్వాత మొదటిసారి అక్కయ్య, బావగారు నగరానికి వస్తుండటంతో ఇల్లంతా సంతోషం నిండింది."
+            },
+            {
+                id: 3,
+                badge: "Scene 3 • దృశ్యం 3",
+                icon: "fa-graduation-cap",
+                accent: "from-purple-500 to-indigo-600",
+                titleEn: "Contrast in Education & Upbringing",
+                titleTe: "చదువు - జీవితాల్లో వ్యత్యాసం (పదేళ్ల మార్పు)",
+                props: ["📚 5th Class vs College", "🌾 Village Agriculture", "💼 City Office Job"],
+                originalEn: `“Akkayya is not as educated as me. By ‘not as educated’ I mean Nannagaru did not let her study after Class Five. Of what use was education for a girl? Those were the days when people thought it was enough if a girl was able to keep the washerman’s accounts. A decade later, when I was born, there wasn’t much debate as to whether a girl should have education or not. I was lucky that my father changed with the times. He didn’t even hesitate to send me to college... Because Akkayya was not educated, she was married to a man from the village.”`,
+                explanationTe: `అక్కయ్య తనలాగా పెద్దగా చదువుకోలేదని అమ్మలు గుర్తుచేసుకుంటుంది. అక్కయ్య పుట్టిన కాలంలో "ఆడపిల్లకు చదువెందుకు? చాకలి పద్దులు (washerman's accounts) రాసుకోగలిగితే చాలు" అనే అభిప్రాయం ఉండేది. అందుకే నాన్నగారు అక్కయ్యను 5వ తరగతితోనే చదువు మాన్పించారు. కానీ పదేళ్ల తర్వాత అమ్మలు పుట్టేసరికి కాలం మారింది. నాన్నగారు కూడా మారి అమ్మలును ఏమాత్రం సంకోచించకుండా కాలేజీకి పంపించారు. బాగా చదువుకున్న ఏ అమ్మాయి పెళ్ళయ్యాక కేవలం ఇంటికే పరిమితమై ఉండాలనుకోదు; తన చదువును సార్థకం చేసుకుని జీవితంలో ఏదైనా సాధించాలనుకుంటుంది. అందుకే భర్తకు మంచి ఉద్యోగం ఉన్నా అమ్మలు కూడా ఉద్యోగంలో చేరింది. అక్కయ్య చదువుకోకపోవడంతో పల్లెటూరిలో వ్యవసాయం చేసే బావగారికి ఇచ్చి పెళ్ళి చేశారు.`,
+                keyTakeawayTe: "కాలంతో పాటు తల్లిదండ్రుల ఆలోచన మారితే ఆడపిల్లల భవిష్యత్తు ఎలా మారుతుందో ఇక్కడ స్పష్టమవుతుంది."
+            },
+            {
+                id: 4,
+                badge: "Scene 4 • దృశ్యం 4",
+                icon: "fa-bowl-food",
+                accent: "from-emerald-600 to-lime-600",
+                titleEn: "Village Delicacies & Sisterly Warmth",
+                titleTe: "కుచేలుడిలా అక్కయ్య తెచ్చిన పల్లెటూరి కానుకలు",
+                props: ["🌿 గోంగూర (Gongura)", "🥒 దోసకాయ & ములక్కాడ", "🍘 అప్పడాలు & వడియాలు"],
+                originalEn: `“Akkayya brought so many things – cucumber, gongura, drumsticks, appadums, vadiyams and coconuts. ‘I hope you don’t mind, I have brought you all these things, like Kuchela. I don’t know whether you’ll like them or not,’ she said, rather hesitantly. ‘Why do you say that? You’ve actually brought all the things we wanted! ... If your Maridi has gongura pulsu, cucumber pappu and drumstick charu he feels as elated as if he has had a sumptuous feast!’”`,
+                explanationTe: `అక్కయ్య చెల్లెలి ఇంటికి వస్తూ దోసకాయలు, గోంగూర, ములక్కాడలు, అప్పడాలు, వడియాలు, కొబ్బరికాయలు — ఇలా ఎన్నో పల్లెటూరి వస్తువులు మూటగట్టుకుని తెచ్చింది. "కుచేలుడు శ్రీకృష్ణుడికి అటుకులు తెచ్చినట్లు ఇవన్నీ తెచ్చాను, మీకు నచ్చుతాయో లేదో" అని అక్కయ్య సంకోచిస్తూ అంది. అందుకు అమ్మలు నవ్వుతూ, "అదేమిటి అక్కయ్యా అలా అంటావు? మాకు కావాల్సినవే తెచ్చావు! నీ మరిదికి (నా భర్తకు) గోంగూర పులుసు, దోసకాయ పప్పు, ములక్కాడ చారు ఉంటే చాలు షడ్రసోపేతమైన విందు భోజనం (sumptuous feast) తిన్నంత సంబరపడిపోతాడు! నా ఆఫీసు పని వల్ల అప్పడాలు, వడియాలు పెట్టే తీరిక, ఓపిక నాకు ఉండవు" అని చెప్పింది.`,
+                keyTakeawayTe: "పల్లెటూరి ఆప్యాయత, అక్కాచెల్లెళ్ల మధ్య ఉండే స్వచ్ఛమైన ప్రేమ ఈ దృశ్యంలో కనిపిస్తాయి."
+            },
+            {
+                id: 5,
+                badge: "Scene 5 • దృశ్యం 5",
+                icon: "fa-briefcase",
+                accent: "from-amber-600 to-red-600",
+                titleEn: "Work Burden vs. Financial Dignity",
+                titleTe: "ఉద్యోగ కష్టాలు vs ఆర్థిక స్వావలంబన - ఆత్మగౌరవం",
+                props: ["🏢 Uphill Task (ఇంటి పని + ఆఫీసు)", "💰 Dignified Life (ఆత్మగౌరవం)", "🌿 కరివేపాకు (Karivepaku)"],
+                originalEn: `“‘What a wretched job! Sometimes, I feel like giving it up. You know, people say, solve your problems at home before you solve those outside. To neglect work at home and look after office work is an uphill task for a woman,’ I said... ‘Don’t think like that, Ammalu. How fortunate you are! Touchwood! You’ve studied well, have a job like a man and are earning very well. You don’t have to beg anyone for anything. You are able to lead a dignified life unlike us who have to depend on our husbands even for a few paise worth of karivepaku,’ said Akkayya. The grass is greener on the other side, I thought to myself.”`,
+                explanationTe: `ఆఫీసు నుండి అలసిపోయి వచ్చి ఇడ్లీలు, దోశలు, ఇంటి పనులు ఎలా చేసుకుంటున్నావో అని అక్కయ్య సానుభూతి చూపింది. అప్పుడు అమ్మలు "పాడు ఉద్యోగం! ఒక్కోసారి మానేద్దాం అనిపిస్తుంది. ఇంటి పనులను పక్కనపెట్టి ఆఫీసు పని చూసుకోవడం ఆడదానికి తలకు మించిన భారం (uphill task)" అంది. దానికి అక్కయ్య వెంటనే, "అలా అనకు అమ్మలూ! నువ్వు ఎంత అదృష్టవంతురాలివి! బాగా చదువుకున్నావు, మగవాడిలా ఉద్యోగం చేస్తూ బాగా సంపాదిస్తున్నావు. ఏ చిన్న దానికోసం ఎవరినీ చేయి చాచి అడగాల్సిన పని లేదు. మా లాగా కొద్ది పైసల కరివేపాకు (karivepaku) కోసం కూడా భర్త మీద ఆధారపడే బతుకు కాకుండా, నువ్వు గౌరవప్రదమైన (dignified) జీవితం గడుపుతున్నావు" అంది. అది విని అమ్మలు మనసులో 'పొరుగింటి పుల్లకూర రుచి' (The grass is greener on the other side - ఒకరి జీవితం మరొకరికి గొప్పగా కనిపిస్తుంది) అని అనుకుంది.`,
+                keyTakeawayTe: "ఆర్థిక స్వాతంత్ర్యం స్త్రీకి ఎవరి ముందూ తలవంచని ఆత్మగౌరవాన్ని ఇస్తుంది."
+            },
+            {
+                id: 6,
+                badge: "Scene 6 • దృశ్యం 6",
+                icon: "fa-hand-fist",
+                accent: "from-rose-600 to-pink-600",
+                titleEn: "Akkayya's Determination for Her Daughter",
+                titleTe: "కూతురి చదువు పట్ల అక్కయ్య పట్టుదల - 'చెప్పు కింద తేలు'",
+                props: ["🎓 College Degree", "🏫 Town Hostel", "🦂 Scorpion under a Slipper"],
+                originalEn: `“‘What’s your daughter doing now?’ I asked, changing the topic. ‘She’s in her final year at school. If by God’s grace she clears her exams, I am determined to send her to college. Your Baavagaaru doesn’t really like the idea of sending her to the next town and putting her in a hostel. But I don’t like to keep a girl at home without educating her. Isn’t what I’m going through enough? In these times, if a woman doesn’t have a degree, she’ll come to nothing. Without it, she will have to live under her husband’s thumb, like a scorpion under a slipper,’ she said.”`,
+                explanationTe: `మాట మారుస్తూ "నీ కూతురు ఇప్పుడు ఏం చేస్తోంది?" అని అమ్మలు అడిగింది. అప్పుడు అక్కయ్య ఎంతో పట్టుదలతో ఇలా చెప్పింది: "అది ఇప్పుడు స్కూలు చివరి సంవత్సరంలో ఉంది. దేవుడి దయ వల్ల పాసైతే దాన్ని ఖచ్చితంగా కాలేజీకి పంపాలని నిశ్చయించుకున్నాను. పక్క ఊరికి పంపి హాస్టల్లో ఉంచడం మీ బావగారికి ఇష్టం లేదు. కానీ ఆడపిల్లను చదివించకుండా ఇంట్లో ఉంచడం నాకు ఇష్టం లేదు. చదువు లేక నేను పడుతున్న కష్టాలు చాలవా? ఈ రోజుల్లో ఆడదానికి డిగ్రీ లేకపోతే దాని బతుకు ఎందుకూ కొరగాకుండా పోతుంది. చదువు లేకపోతే భర్త చేతి కింద, చెప్పు కింద తేలులా (like a scorpion under a slipper) అణగిమణగి బతకాల్సి వస్తుంది" అని అక్కయ్య ఆవేదనతో కూడిన గట్టి నిర్ణయాన్ని వెల్లడించింది.`,
+                keyTakeawayTe: "తాను చదువుకోకపోయినా తన కూతురికి ఉన్నత విద్య అందించి స్వతంత్రురాలిని చేయాలనే అక్కయ్య తపనే 'మహిళా సాధికారత'కు నిజమైన ప్రతీక!"
+            }
+        ];
+
+        /* ==========================================
+           2. GLOSSARY & IDIOMS 3D FLIP-CARD DATA
+           ========================================== */
+        const glossaryData = [
+            {
+                word: "Exhaustion",
+                pos: "Noun",
+                teluguWord: "తీవ్రమైన అలసట / నీరసం",
+                meaningEn: "Extreme tiredness after office work.",
+                exampleTe: "ఉత్తరాలు చూడగానే ఆఫీసు పని అలసట (exhaustion) మాయమవుతుంది."
+            },
+            {
+                word: "Apprehensive",
+                pos: "Adjective",
+                teluguWord: "ఆందోళన / భయం",
+                meaningEn: "Anxious or fearful that something bad might happen.",
+                exampleTe: "అక్కయ్య ఉత్తరం తెరుస్తున్నప్పుడు ఏదైనా చెడు వార్త ఏమోనని భయపడింది."
+            },
+            {
+                word: "Sumptuous",
+                pos: "Adjective",
+                teluguWord: "షడ్రసోపేతమైన విందు",
+                meaningEn: "Grand, splendid, and lavish meal.",
+                exampleTe: "గోంగూర పులుసు, దోసకాయ పప్పు ఉంటే గొప్ప విందు భోజనంలా భావిస్తాడు."
+            },
+            {
+                word: "Uphill task",
+                pos: "Idiom / Phrase",
+                teluguWord: "చాలా కష్టమైన పని",
+                meaningEn: "A very difficult job requiring great effort.",
+                exampleTe: "ఇంటి పని, ఆఫీసు పని రెండింటినీ నిర్వహించడం మహిళకు కష్టమైన పని."
+            },
+            {
+                word: "Dignified",
+                pos: "Adjective",
+                teluguWord: "గౌరవప్రదమైన / ఆత్మగౌరవ",
+                meaningEn: "Deserving respect; independent and self-respecting.",
+                exampleTe: "చదువు, ఉద్యోగం వల్ల అమ్మలు గౌరవప్రదమైన జీవితాన్ని గడుపుతోంది."
+            },
+            {
+                word: "Keep washerman's accounts",
+                pos: "Idiom",
+                teluguWord: "చాకలి పద్దులు రాయడం",
+                meaningEn: "Basic literacy just enough to manage household chores.",
+                exampleTe: "పాత కాలంలో ఆడపిల్లలు చాకలి పద్దులు రాస్తే చాలనుకునేవారు."
+            },
+            {
+                word: "Grass is greener on the other side",
+                pos: "Proverb",
+                teluguWord: "పొరుగింటి పుల్లకూర రుచి",
+                meaningEn: "Others' lives always seem better than our own.",
+                exampleTe: "అమ్మలుకు ఉద్యోగం కష్టమనిపిస్తే, అక్కయ్యకు మాత్రం అమ్మలు జీవితం గొప్పగా కనిపించింది."
+            },
+            {
+                word: "Like a scorpion under a slipper",
+                pos: "Simile / Idiom",
+                teluguWord: "చెప్పు కింద తేలులా బతకడం",
+                meaningEn: "Feeling totally suppressed and living under a husband's thumb.",
+                exampleTe: "డిగ్రీ లేకపోతే ఆడది భర్త దగ్గర చెప్పు కింద తేలులా అణగిమణగి బతకాల్సి వస్తుంది."
+            }
+        ];
+
+        /* ==========================================
+           3. QUIZ DATA (BILINGUAL)
+           ========================================== */
+        const quizData = [
+            {
+                qEn: "1. How does the narrator (Ammalu) feel when she sees letters waiting on the doorstep?",
+                qTe: "1. ఆఫీసు నుండి రాగానే గుమ్మం దగ్గర ఉత్తరాలు కనిపిస్తే అమ్మలుకు ఎలా అనిపిస్తుంది?",
+                options: [
+                    { text: "She feels more tired and angry (మరింత అలసట, కోపం వస్తాయి)", correct: false },
+                    { text: "Her exhaustion vanishes and she feels like singing & making coffee/pakodas (అలసట మాయమై పాట పాడుతూ కాఫీ, పకోడీలు చేసుకోవాలనిపిస్తుంది)", correct: true },
+                    { text: "She ignores the letters until the next morning (మరుసటి రోజు వరకు పట్టించుకోదు)", correct: false }
+                ],
+                explanation: "సరియైన సమాధానం! ఉత్తరాలు చూడగానే ఆప్తులతో మాట్లాడినట్లనిపించి ఆమె అలసట మాయమవుతుంది."
+            },
+            {
+                qEn: "2. Why did Nannagaru stop Akkayya's education after Class Five?",
+                qTe: "2. నాన్నగారు అక్కయ్య చదువును 5వ తరగతితోనే ఎందుకు ఆపేశారు?",
+                options: [
+                    { text: "Because people then thought it was enough if a girl could keep the washerman's accounts (ఆడపిల్ల చాకలి పద్దులు రాస్తే చాలనుకునే కాలం కాబట్టి)", correct: true },
+                    { text: "Because there was no school in their village (ఊరిలో బడి లేకపోవడం వల్ల)", correct: false },
+                    { text: "Because Akkayya hated going to school (అక్కయ్యకు బడికి వెళ్ళడం ఇష్టం లేక)", correct: false }
+                ],
+                explanation: "సరియైన సమాధానం! ఆ రోజుల్లో ఆడపిల్లకు చదువు ఎందుకనే భావన సమాజంలో ఉండేది."
+            },
+            {
+                qEn: "3. With whom did Akkayya compare herself when she brought village food items to Ammalu's house?",
+                qTe: "3. గోంగూర, ములక్కాడలు, అప్పడాలు, వడియాలు తెచ్చినప్పుడు అక్కయ్య తనను ఎవరితో పోల్చుకుంది?",
+                options: [
+                    { text: "Sabari (శబరి)", correct: false },
+                    { text: "Kuchela / Sudama (కుచేలుడు)", correct: true },
+                    { text: "Duryodhana (దుర్యోధనుడు)", correct: false }
+                ],
+                explanation: "సరియైన సమాధానం! 'కుచేలుడిలా ఇవన్నీ తెచ్చాను, మీకు నచ్చుతాయో లేదో' అని అక్కయ్య అంది."
+            },
+            {
+                qEn: "4. Why does Akkayya consider Ammalu very fortunate?",
+                qTe: "4. అమ్మలు చాలా అదృష్టవంతురాలని అక్కయ్య ఎందుకు అంటుంది?",
+                options: [
+                    { text: "Because Ammalu lives in a big house (పెద్ద ఇంట్లో ఉంటుందని)", correct: false },
+                    { text: "Because Ammalu is educated, earns her own money, and leads a dignified life without begging anyone (చదువుకుని, సంపాదిస్తూ, ఎవరినీ చేయి చాచి అడగకుండా గౌరవంగా బతుకుతోందని)", correct: true },
+                    { text: "Because Ammalu doesn't have to cook at home (ఇంట్లో వంట చేయాల్సిన పని లేదని)", correct: false }
+                ],
+                explanation: "సరియైన సమాధానం! కరివేపాకు కోసం కూడా భర్తపై ఆధారపడే పని లేకుండా అమ్మలు స్వతంత్రంగా జీవిస్తోంది."
+            },
+            {
+                qEn: "5. What does the simile 'like a scorpion under a slipper' (చెప్పు కింద తేలులా) mean in the lesson?",
+                qTe: "5. 'చెప్పు కింద తేలులా' (like a scorpion under a slipper) అనే పోలికకు ఈ పాఠంలో అర్థం ఏమిటి?",
+                options: [
+                    { text: "Living a completely suppressed life under a husband's control without independence (చదువు, స్వాతంత్ర్యం లేక భర్త ఆధీనంలో అణగిమణగి బతకడం)", correct: true },
+                    { text: "Walking carefully in a village at night (రాత్రిపూట పల్లెటూరిలో జాగ్రత్తగా నడవడం)", correct: false },
+                    { text: "Being very angry with everyone (అందరి మీద కోపంగా ఉండటం)", correct: false }
+                ],
+                explanation: "సరియైన సమాధానం! ఆడపిల్లకు డిగ్రీ/చదువు లేకపోతే భర్త చేతి కింద అణగిమణగి బతకాల్సి వస్తుందని అక్కయ్య అంటుంది."
+            }
+        ];
+
+        /* ==========================================
+           4. UI RENDERING & INTERACTIVITY LOGIC
+           ========================================== */
+        let currentSceneIndex = 0;
+        let currentLayout = 'carousel'; // 'carousel' or 'grid'
+        let currentLang = 'both'; // 'both', 'te', 'en'
+
+        function renderScenes() {
+            const container = document.getElementById('scenes-container');
+            const indicators = document.getElementById('scene-indicators');
+            const pillsBar = document.getElementById('scene-pills-bar');
+            const counter = document.getElementById('scene-counter');
+
+            // Update pills
+            indicators.innerHTML = scenesData.map((s, idx) => `
+                <button onclick="goToScene(${idx})" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${idx === currentSceneIndex ? 'bg-gradient-to-r from-marigold to-terracotta text-indigoDeep shadow-md scale-105' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
+                    ${s.id}. <span class="font-telugu">${s.titleTe.split(' - ')[0]}</span>
+                </button>
+            `).join('');
+
+            counter.textContent = `${currentSceneIndex + 1} / ${scenesData.length}`;
+
+            if (currentLayout === 'carousel') {
+                pillsBar.classList.remove('hidden');
+                const scene = scenesData[currentSceneIndex];
+                container.innerHTML = createSceneCardHTML(scene, true);
+            } else {
+                pillsBar.classList.add('hidden');
+                container.innerHTML = `<div class="grid grid-cols-1 gap-8">${scenesData.map(s => createSceneCardHTML(s, false)).join('')}</div>`;
+            }
+
+            attach3DTiltListeners();
+        }
+
+        function createSceneCardHTML(scene, isCarousel) {
+            const showEn = currentLang === 'both' || currentLang === 'en';
+            const showTe = currentLang === 'both' || currentLang === 'te';
+            const gridCols = (showEn && showTe) ? 'lg:grid-cols-2' : 'grid-cols-1';
+
+            return `
+                <div class="card-3d-tilt glass-panel rounded-3xl p-6 sm:p-8 border border-amber-500/30 relative overflow-hidden transition-all">
+                    <!-- Top Decorative Gradient Bar -->
+                    <div class=" h-1.5 w-full bg-gradient-to-r ${scene.accent} absolute top-0 left-0"></div>
+
+                    <div class="card-3d-content space-y-6">
+                        <!-- Header Row -->
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${scene.accent} flex items-center justify-center text-white text-xl shadow-lg">
+                                    <i class="fa-solid ${scene.icon}"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-amber-400">${scene.badge}</span>
+                                    <h3 class="text-xl sm:text-2xl font-extrabold text-white font-telugu">${scene.titleTe}</h3>
+                                    <p class="text-xs sm:text-sm text-slate-300 font-serif italic">${scene.titleEn}</p>
+                                </div>
+                            </div>
+
+                            <!-- 3D Floating Prop Badges -->
+                            <div class="flex flex-wrap gap-2 card-3d-badge">
+                                ${scene.props.map(p => `
+                                    <span class="px-3 py-1 rounded-full bg-slate-900/90 border border-amber-400/30 text-amber-200 text-xs font-semibold shadow-md">
+                                        ${p}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Bilingual Content Grid -->
+                        <div class="grid grid-cols-1 ${gridCols} gap-6 pt-2">
+                            ${showTe ? `
+                            <div class="bg-gradient-to-br from-amber-950/40 to-slate-900/90 p-5 sm:p-6 rounded-2xl border border-amber-500/30 space-y-3">
+                                <div class="flex items-center justify-between border-b border-amber-500/20 pb-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-language text-base"></i> తెలుగు వివరణ (Telugu Explanation)
+                                    </span>
+                                    <span class="text-[11px] text-amber-200/70 font-telugu">సులభమైన శైలిలో</span>
+                                </div>
+                                <p class="text-slate-100 leading-relaxed text-base sm:text-[17px] font-telugu">
+                                    ${scene.explanationTe}
+                                </p>
+                            </div>
+                            ` : ''}
+
+                            ${showEn ? `
+                            <div class="bg-slate-900/85 p-5 sm:p-6 rounded-2xl border border-slate-700/80 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-book-bookmark"></i> Original English Textbook Excerpt
+                                    </span>
+                                    <span class="text-[11px] text-slate-400">Pages 107–108</span>
+                                </div>
+                                <p class="text-slate-300 leading-relaxed text-sm sm:text-base italic font-serif">
+                                    ${scene.originalEn}
+                                </p>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Key Moral / Takeaway Bar -->
+                        <div class="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-3.5 flex items-center gap-3">
+                            <i class="fa-solid fa-lightbulb text-amber-400 text-lg shrink-0"></i>
+                            <p class="text-xs sm:text-sm text-emerald-200 font-telugu">
+                                <strong>ముఖ్య ఆంతర్యం:</strong> ${scene.keyTakeawayTe}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function changeScene(delta) {
+            currentSceneIndex = (currentSceneIndex + delta + scenesData.length) % scenesData.length;
+            renderScenes();
+        }
+
+        function goToScene(idx) {
+            currentSceneIndex = idx;
+            renderScenes();
+        }
+
+        function toggleStoryLayout(layout) {
+            currentLayout = layout;
+            const btnCarousel = document.getElementById('layout-carousel');
+            const btnGrid = document.getElementById('layout-grid');
+            if (layout === 'carousel') {
+                btnCarousel.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 text-indigoDeep shadow-md transition";
+                btnGrid.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold glass-panel text-slate-200 hover:text-amber-300 transition";
+            } else {
+                btnGrid.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 text-indigoDeep shadow-md transition";
+                btnCarousel.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold glass-panel text-slate-200 hover:text-amber-300 transition";
+            }
+            renderScenes();
+        }
+
+        function setLanguageMode(mode) {
+            currentLang = mode;
+            ['both', 'te', 'en'].forEach(m => {
+                const btn = document.getElementById(`lang-${m}`);
+                if (m === mode) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderScenes();
+        }
+
+        /* 3D Mouse Tilt Effect on Scene Cards */
+        function attach3DTiltListeners() {
+            const cards = document.querySelectorAll('.card-3d-tilt');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -4;
+                    const rotateY = ((x - centerX) / centerX) * 4;
+                    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+                });
+            });
+        }
+
+        /* ==========================================
+           5. RENDER 3D FLIP-CARD GLOSSARY
+           ========================================== */
+        function renderGlossary() {
+            const grid = document.getElementById('glossary-grid');
+            grid.innerHTML = glossaryData.map((item, idx) => `
+                <div class="flip-card cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <!-- Front -->
+                        <div class="flip-card-front space-y-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
+                                ${item.pos}
+                            </span>
+                            <h4 class="text-xl font-extrabold text-white">${item.word}</h4>
+                            <p class="text-xs text-slate-300">${item.meaningEn}</p>
+                            <div class="pt-3 text-[11px] text-amber-400 flex items-center gap-1">
+                                <i class="fa-solid fa-rotate"></i> తెలుగు అర్థం కోసం తిప్పండి
+                            </div>
+                        </div>
+                        <!-- Back -->
+                        <div class="flip-card-back space-y-2">
+                            <span class="text-xs uppercase tracking-widest text-amber-200 font-bold">${item.word}</span>
+                            <h4 class="text-xl font-extrabold text-white font-telugu">${item.teluguWord}</h4>
+                            <p class="text-xs text-amber-100 font-telugu leading-relaxed">${item.exampleTe}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* ==========================================
+           6. RENDER INTERACTIVE QUIZ
+           ========================================== */
+        let userAnswers = {};
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = quizData.map((q, qIdx) => {
+                const answered = userAnswers[qIdx] !== undefined;
+                return `
+                    <div class="bg-slate-900/80 rounded-2xl p-5 border border-slate-700/80 space-y-3">
+                        <h4 class="text-base sm:text-lg font-bold text-amber-300 font-telugu">${q.qTe}</h4>
+                        <p class="text-xs sm:text-sm text-slate-400">${q.qEn}</p>
+                        <div class="grid grid-cols-1 gap-2.5 pt-2">
+                            ${q.options.map((opt, oIdx) => {
+                                let btnStyle = "bg-slate-800/90 hover:bg-slate-700 text-slate-200 border-slate-700";
+                                if (answered) {
+                                    if (opt.correct) {
+                                        btnStyle = "bg-emerald-900/70 border-emerald-400 text-emerald-100 font-bold";
+                                    } else if (userAnswers[qIdx] === oIdx) {
+                                        btnStyle = "bg-rose-900/70 border-rose-400 text-rose-100";
+                                    } else {
+                                        btnStyle = "bg-slate-900/50 text-slate-500 border-slate-800";
+                                    }
+                                }
+                                return `
+                                    <button onclick="selectQuizOption(${qIdx}, ${oIdx})" ${answered ? 'disabled' : ''} class="text-left px-4 py-3 rounded-xl border text-sm font-telugu transition-all flex items-center justify-between ${btnStyle}">
+                                        <span>${opt.text}</span>
+                                        ${answered && opt.correct ? '<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>' : ''}
+                                        ${answered && !opt.correct && userAnswers[qIdx] === oIdx ? '<i class="fa-solid fa-circle-xmark text-rose-400 text-lg"></i>' : ''}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                        ${answered ? `
+                            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs sm:text-sm text-amber-200 font-telugu mt-2">
+                                <i class="fa-solid fa-star text-amber-400 mr-1"></i> ${q.explanation}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Update score
+            let score = 0;
+            Object.keys(userAnswers).forEach(k => {
+                if (quizData[k].options[userAnswers[k]].correct) score++;
+            });
+            document.getElementById('quiz-score-badge').textContent = `${score} / ${quizData.length}`;
+        }
+
+        function selectQuizOption(qIdx, oIdx) {
+            userAnswers[qIdx] = oIdx;
+            renderQuiz();
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            renderQuiz();
+        }
+
+        /* ==========================================
+           7. THREE.JS 3D BONSAI VS EMPOWERED TREE SCENE
+           ========================================== */
+        let scene, camera, renderer, treeGroup, potGroup, foliageBalls = [];
+        let targetScale = 1;
+        let currentTreeMode = 'bonsai';
+        let isDragging = false, prevMouseX = 0, prevMouseY = 0;
+
+        function initThreeJS() {
+            const container = document.getElementById('three-canvas-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(0, 2.2, 7.5);
+            camera.lookAt(0, 0.8, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.insertBefore(renderer.domElement, container.firstChild);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xfcd34d, 1.2);
+            dirLight.position.set(5, 8, 5);
+            scene.add(dirLight);
+
+            const pointLight = new THREE.PointLight(0x10b981, 0.9, 15);
+            pointLight.position.set(-4, 3, 3);
+            scene.add(pointLight);
+
+            // Ground / Pedestal
+            const groundGeo = new THREE.CylinderGeometry(2.6, 2.8, 0.25, 32);
+            const groundMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.position.y = -1.6;
+            scene.add(ground);
+
+            // Pot Group (Terracotta Pot for Bonsai)
+            potGroup = new THREE.Group();
+            const potGeo = new THREE.CylinderGeometry(1.15, 0.8, 0.9, 24);
+            const potMat = new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 0.45 });
+            const potMesh = new THREE.Mesh(potGeo, potMat);
+            potMesh.position.y = -1.0;
+            potGroup.add(potMesh);
+
+            const rimGeo = new THREE.CylinderGeometry(1.25, 1.25, 0.18, 24);
+            const rimMesh = new THREE.Mesh(rimGeo, potMat);
+            rimMesh.position.y = -0.55;
+            potGroup.add(rimMesh);
+            scene.add(potGroup);
+
+            // Tree Group
+            treeGroup = new THREE.Group();
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.8 });
+            const trunkGeo = new THREE.CylinderGeometry(0.22, 0.38, 2.0, 12);
+            const trunkMesh = new THREE.Mesh(trunkGeo, trunkMat);
+            trunkMesh.position.y = 0.2;
+            treeGroup.add(trunkMesh);
+
+            // Branches & Foliage Clusters
+            const foliagePositions = [
+                { x: 0, y: 1.4, z: 0, r: 0.85, col: 0x10b981 },
+                { x: -0.75, y: 1.0, z: 0.3, r: 0.65, col: 0x059669 },
+                { x: 0.8, y: 1.1, z: -0.2, r: 0.7, col: 0x34d399 },
+                { x: 0.2, y: 1.85, z: -0.3, r: 0.6, col: 0xf59e0b }, // Marigold/Turayi blossoms
+                { x: -0.4, y: 1.65, z: 0.4, r: 0.55, col: 0xe05a47 }
+            ];
+
+            foliagePositions.forEach(pos => {
+                const geo = new THREE.DodecahedronGeometry(pos.r, 1);
+                const mat = new THREE.MeshStandardMaterial({
+                    color: pos.col,
+                    roughness: 0.4,
+                    flatShading: true
+                });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(pos.x, pos.y, pos.z);
+                treeGroup.add(mesh);
+                foliageBalls.push(mesh);
+            });
+
+            scene.add(treeGroup);
+            treeGroup.scale.set(0.75, 0.75, 0.75);
+
+            // Mouse & Touch Rotation Interaction
+            container.addEventListener('mousedown', e => { isDragging = true; prevMouseX = e.clientX; prevMouseY = e.clientY; });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+            window.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - prevMouseX;
+                treeGroup.rotation.y += deltaX * 0.01;
+                potGroup.rotation.y += deltaX * 0.01;
+                prevMouseX = e.clientX;
+            });
+
+            container.addEventListener('touchstart', e => {
+                if (e.touches.length === 1) {
+                    isDragging = true;
+                    prevMouseX = e.touches[0].clientX;
+                }
+            }, { passive: true });
+            window.addEventListener('touchend', () => { isDragging = false; });
+            window.addEventListener('touchmove', e => {
+                if (!isDragging || e.touches.length !== 1) return;
+                const deltaX = e.touches[0].clientX - prevMouseX;
+                treeGroup.rotation.y += deltaX * 0.012;
+                potGroup.rotation.y += deltaX * 0.012;
+                prevMouseX = e.touches[0].clientX;
+            }, { passive: true });
+
+            window.addEventListener('resize', () => {
+                if (!container) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            animateThreeJS();
+        }
+
+        function switch3DTree(mode) {
+            currentTreeMode = mode;
+            const titleEl = document.getElementById('tree-mode-title');
+            const captionEl = document.getElementById('tree-caption');
+            const btnBonsai = document.getElementById('btn-3d-bonsai');
+            const btnFree = document.getElementById('btn-3d-free');
+
+            if (mode === 'bonsai') {
+                titleEl.textContent = "కుండీలో బోన్సాయ్ చెట్టు (Confined Bonsai Life)";
+                captionEl.textContent = "చదువు లేకపోతే స్త్రీ జీవితం కుండీలో పెరిగే బోన్సాయ్ చెట్టులా ఇతరులపై ఆధారపడి ఉంటుంది.";
+                btnBonsai.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-terracotta text-white shadow-md transition";
+                btnFree.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600 hover:text-white transition";
+            } else {
+                titleEl.textContent = "స్వేచ్ఛగా ఎదిగిన తురాయి చెట్టు (Empowered Woman)";
+                captionEl.textContent = "చదువు, ఆర్థిక స్వాతంత్ర్యం ఉన్న స్త్రీ స్వేచ్ఛగా ఎదిగే చెట్టులా తన కాళ్ల మీద తాను నిలబడి పదిమందికి నీడనిస్తుంది!";
+                btnFree.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-indigoDeep shadow-md transition";
+                btnBonsai.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-rose-300 border border-rose-500/40 hover:bg-terracotta hover:text-white transition";
+            }
+        }
+
+        function animateThreeJS() {
+            requestAnimationFrame(animateThreeJS);
+
+            if (!isDragging && treeGroup) {
+                treeGroup.rotation.y += 0.006;
+                potGroup.rotation.y += 0.006;
+            }
+
+            // Smoothly interpolate scale between stunted Bonsai and tall Free Tree
+            const desiredScale = currentTreeMode === 'bonsai' ? 0.72 : 1.38;
+            treeGroup.scale.x += (desiredScale - treeGroup.scale.x) * 0.06;
+            treeGroup.scale.y += (desiredScale - treeGroup.scale.y) * 0.06;
+            treeGroup.scale.z += (desiredScale - treeGroup.scale.z) * 0.06;
+
+            // Shrink pot when in Free Tree mode to symbolize breaking free from confinement
+            const desiredPotScale = currentTreeMode === 'bonsai' ? 1.0 : 0.01;
+            potGroup.scale.x += (desiredPotScale - potGroup.scale.x) * 0.08;
+            potGroup.scale.z += (desiredPotScale - potGroup.scale.z) * 0.08;
+
+            renderer.render(scene, camera);
+        }
+
+        /* Initialize Everything on Window Load */
+        window.onload = function () {
+            renderScenes();
+            renderGlossary();
+            renderQuiz();
+            initThreeJS();
+        };
+    </script>
+</body>
+</html>
